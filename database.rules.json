@@ -1,0 +1,27 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "games": {
+      "$code": {
+        ".read": true,
+        ".write": "$code.matches(/^[A-Z]{4}$/)",
+        "players": {
+          "$id": {
+            "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 16" },
+            "score": { ".validate": "newData.isNumber()" }
+          }
+        }
+      }
+    },
+    "clock": {
+      "$code": {
+        "$id": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Buzzer tests</title>
+<style>body{font:15px system-ui;margin:20px;background:#fff;color:#111}.ok{color:#087a2f}.bad{color:#c00;font-weight:700}</style></head>
+<body>
+<h1>Buzzer tests</h1>
+<ul id="out"></ul>
+<script type="module">
+import { addPress } from '../js/buzz.js';
+const out = document.getElementById('out');
+let failed = 0;
+const check = (name, ok) => {
+  if (!ok) failed++;
+  out.insertAdjacentHTML('beforeend', `<li class="${ok ? 'ok' : 'bad'}">${ok ? 'PASS' : 'FAIL'} ${name}</li>`);
+};
+const live = { round: 3, live: true };
+
+let b = addPress(live, 3, 'avi', 1000);
+check('first press wins', b.winner.id === 'avi');
+b = addPress(b, 3, 'dana', 960);
+check('earlier press that arrives later takes the win', b.winner.id === 'dana' && b.winner.t === 960);
+b = addPress(b, 3, 'noa', 1100);
+check('later press is recorded but does not win', b.winner.id === 'dana' && b.presses.noa === 1100);
+check('second press by the same player is ignored', addPress(b, 3, 'avi', 1) === undefined);
+check('press from an old round is ignored', addPress({ round: 4, live: true }, 3, 'avi', 1) === undefined);
+check('press while locked is ignored', addPress({ round: 3, live: false }, 3, 'avi', 1) === undefined);
+check('no state is ignored', addPress(null, 3, 'avi', 1) === undefined);
+const tie = addPress(addPress(live, 3, 'zed', 500), 3, 'amy', 500);
+check('exact tie is decided the same way everywhere', tie.winner.id === 'amy');
+document.title = failed ? `FAIL ${failed}` : 'PASS';
+</script>
+</body>
+</html>
